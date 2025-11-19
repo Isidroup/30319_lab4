@@ -1,12 +1,12 @@
-# Laboratorio 4 - Modulación FSK y Gestión de Audio
+# 30319 Laboratorio 4: Modulación FSK, modem v.23
 
-Este proyecto implementa un sistema de modulación FSK (Frequency Shift Keying) y gestión de audio para microcontroladores FM4, utilizando un codec de audio WM8731 y un ejecutivo cíclico basado en Round-Robin.
+Este proyecto implementa un sistema de modulación FSK (Frequency Shift Keying) para microcontroladores FM4, utilizando un codec de audio WM8731.
 
 ## Descripción General
 
 El proyecto consiste en un sistema embebido que:
 - Genera señales FSK moduladas controladas por pulsaciones de botón
-- Gestiona audio a través de I2S con buffer circular
+- Utiliza interrupciones para la transmisión de la señal analógica a través de I2S con buffer circular
 - Implementa control visual mediante LEDs RGB
 - Utiliza un ejecutivo cíclico para la gestión de tareas en tiempo real
 
@@ -72,57 +72,5 @@ lab4/
 - **`test_circ_buf.c`**: Pruebas para el buffer circular
 - **`test_lab4.c`**: Pruebas específicas del laboratorio
 
-## Funcionalidad del Sistema
 
-### Ejecutivo Cíclico (Base de tiempo: 1ms)
-
-El sistema implementa 5 tareas principales:
-
-1. **Tarea 1**: Evaluación del estado del pulsador SW2
-   - Detecta pulsaciones cortas, largas o ninguna
-
-2. **Tarea 2**: Control del contador
-   - Pulsación corta: incrementa contador (0-7)
-   - Pulsación larga: reinicia contador a 0
-
-3. **Tarea 3**: Control del LED RGB
-   - 8 colores diferentes según el valor del contador
-   - Estados: OFF, RED, GREEN, BLUE, YELLOW, MAGENTA, CYAN, WHITE
-
-4. **Tarea 4**: Generación de muestras FSK
-   - `lab41()`: Modulación FSK controlada por pulsaciones
-   - `lab42()`: Modulación FSK para transmisión de texto
-   - Almacenamiento en buffer circular protegido por interrupciones
-
-5. **Tarea 5**: Efecto breathing en LED ETH
-   - Se ejecuta continuamente para crear efecto visual
-
-### Configuración del Audio
-
-- **Frecuencia de muestreo**: 48 kHz
-- **Entrada de audio**: LINE_IN
-- **Ganancia de salida**: 0 dB (auriculares)
-- **Ganancia de entrada**: 0 dB (line-in)
-
-### Comunicación ISR
-
-El buffer circular `g_tx_buffer` se comparte entre `main()` y la ISR de I2S, con operaciones protegidas mediante `__disable_irq()/__enable_irq()`.
-
-## Compilación y Uso
-
-1. Abrir el proyecto en Keil uVision 5
-2. Cargar `build_keil/lab4.uvprojx`
-3. Compilar y cargar en la placa FM4
-4. Utilizar el pulsador SW2 para controlar la modulación FSK
-5. Observar los cambios en el LED RGB según el estado del contador
-
-## Referencias
-
-- David E. Simon, "An Embedded Software Primer", Addison-Wesley 2005
-  (Diseño del ejecutivo cíclico Round-Robin)
-
-## Notas de Desarrollo
-
-- El proyecto utiliza ARM Cortex-M4 como procesador objetivo
-- Implementa protección de variables compartidas en contexto de interrupciones
-- Diseño modular con separación clara entre HAL, BSP y lógica de aplicación
+keywords: FSK, I2S, WM8731, DDS, Buffer Circular, Ejecutivo Cíclico, FM4, Modulación.
