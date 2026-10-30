@@ -13,7 +13,6 @@ El proyecto consiste en un sistema embebido que:
 ### Hardware Utilizado
 - Placa FM4 con codec de audio WM8731
 - LED RGB para indicación visual del estado
-- LED ETH con efecto breathing
 - Pulsador SW2 para control de usuario
 - Comunicación I2S para transmisión de audio
 

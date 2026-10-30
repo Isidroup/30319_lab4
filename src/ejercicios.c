@@ -5,7 +5,7 @@
  *          (Frequency Shift Keying) para transmisión de datos digitales a través de
  *          señales de audio. Se utilizan técnicas de DDS (Direct Digital Synthesis)
  *          para generar las frecuencias portadoras.
- * @date :2025/10/22 08:14:47
+ * @date :2026/10/28 20:47:44
  */
 
 #include "ejercicios.h"
@@ -14,7 +14,7 @@
 
 
 /**
- * @name Definiciones para modulación FSK según estándar V.25
+ * @name Definiciones para modulación FSK según estándar V.23
  * @brief Macros de configuración para evitar números mágicos en el código.
  * @{
  */
@@ -23,7 +23,7 @@
  * @def M0_V23
  * @brief Incremento de fase DDS para generar frecuencia de bit '0' (2100 Hz).
  * @details Valor calculado como: (2100 Hz / fs) × 65536, donde fs = 48000 Hz
- *          Representa la frecuencia de "marca" en modulación FSK V.25.
+ *          Representa la frecuencia de "espacio" en modulación FSK V.23.
  */
 #define M0_V23 ......
 
@@ -31,7 +31,7 @@
  * @def M1_V23
  * @brief Incremento de fase DDS para generar frecuencia de bit '1' (1300 Hz).
  * @details Valor calculado como: (1300 Hz / fs) × 65536, donde fs = 48000 Hz
- *          Representa la frecuencia de "espacio" en modulación FSK V.25.
+ *          Representa la frecuencia de "marca" en modulación FSK V.23.
  */
 #define M1_V23 .....
 

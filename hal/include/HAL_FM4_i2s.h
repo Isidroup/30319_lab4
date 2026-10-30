@@ -1,7 +1,7 @@
 /**
  * @file HAL_FM4_i2s.h
  * @brief Interfaz HAL para el periférico I2S en FM4.
- * @date :2025/10/08 12:05:47
+ * @date :2026/10/29 09:43:11
  *
  * Proporciona funciones para inicializar, transmitir, recibir y controlar el periférico I2S.
  * Permite la configuración de la frecuencia de muestreo y el manejo de buffers de transmisión y recepción.
@@ -63,5 +63,14 @@ uint8_t I2S_isTxBufferFree(void);
  * @return 1 si el buffer contiene datos, 0 si está vacío.
  */
 uint8_t I2S_isRxBufferNotEmpty(void);
+
+/**
+ * @brief Obtiene el estado de underrun de transmisión del registro STATUS de I2S.
+ *
+ * @return uint8_t Devuelve:
+ *         - Bit 0: TXUDR0 (Underrun durante la trama)
+ *         - Bit 1: TXUDR1 (Underrun al inicio de la trama)
+ */
+uint8_t I2S_get_tx_underrun(void);
 
 #endif

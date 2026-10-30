@@ -11,7 +11,7 @@
 
 #include "s6e2cc.h"
 #include "circ_buf.h"
-#include "ejercicios.h"
+
 
 
 
@@ -27,25 +27,61 @@ void PRGCRC_I2S_IRQHandler(void)
 
   // 🗲 Si la interrupción se ha producido porque hay hueco
   //      en el buffer de salida de I2S
-
   if (I2S_isTxBufferFree()) {
 
-    // Lee datos del buffer circular
-    int16_t txdata;
-    // TODO : Lee muestra del buffer circular
-    uint8_t error = ...
-    
-    if ( error != 0) {
-       // Si no hay datos en el buffer de transmisión, detiene la ejecución
-        __BKPT(2); // ERROR, no debería pasar por aquí
-    }
-    // TODO:Envía muestra al canal izquierdo del codec, silencio en derecho
-    ...
+    // La condición de interrupción es «la FIFO tiene hueco». Se rellena hasta
+    // eliminarla para evitar que la ISR se reactive inmediatamente.
+
+    /*
+     *                             ▼
+     *                 ╱─────────────────────╲
+     *                ╱  ¿I2S TX solicita     ╲ no
+     *               ⟨       servicio?         ⟩──────────────────┐
+     *                ╲                       ╱                   │
+     *                 ╲─────────────────────╱                    │
+     *                            │ sí                            │
+     *                            ▼                               │
+     *                  ╱───────────────────╲                     │
+     *                 ╱  ¿Hay espacio en    ╲ no                 │
+     *    ┌──────────►⟨       FIFO?           ⟩─────────┐         │
+     *    │            ╲                     ╱          │         │
+     *    │             ╲───────────────────╱           │         │
+     *    │                       │ sí                  │         │
+     *    │                       ▼                     │         │
+     *    │             ╱───────────────────╲           │         │
+     *    │            ╱  ¿g_tx_buffer tiene ╲          │         │
+     *    │           ⟨       una muestra?    ⟩         │         │
+     *    │            ╲                     ╱          │         │
+     *    │             ╲───────────────────╱           │         │
+     *    │                ╱             ╲              │         │
+     *    │            sí ╱               ╲ no          │         │
+     *    │              ▼                 ▼            │         │
+     *    │ ┌──────────────┐     ┌─────────────────┐    │         │
+     *    │ │ Extraer      │     │ Incrementar     │    │         │
+     *    │ │ muestra y    │     │ contador de     │    │         │
+     *    │ │ escribirla   │     │ infraflujo      │    │         │
+     *    │ │ en FIFO I2S  │     │ software y      │    │         │
+     *    │ └──────┬───────┘     │ escribir        │    │         │
+     *    │        │             │ silencio        │    │         │
+     *    │        │             └────────┬────────┘    │         │
+     *    │        │                      │             │         │
+     *    │        └──────────┬───────────┘             │         │
+     *    │                   │ (Repetir while)         │         │
+     *    └───────────────────┴                         ┼─────────┘
+     *                                                  │
+     *                                                  ▼
+     *                                               ╭──────╮
+     *                                               │ Fin  │
+     *                                               ╰──────╯
+     */
+
+
   }
 
   // 🗲 Si la interrupción se ha producido porque hay un dato nuevo
   //       en el buffer de entrada de I2S0
   if (I2S_isRxBufferNotEmpty()) {
+
     // No se hace nada, se completará en lab5
   }
   // NVIC_ClearPendingIRQ(PRGCRC_I2S_IRQn);

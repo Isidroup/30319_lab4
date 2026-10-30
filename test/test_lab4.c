@@ -42,6 +42,8 @@
 #include "ejercicios.h"
 #include <stdint.h>
 
+#include "ARMCM4.h"
+
 // Variables globales para el test
 __attribute__((section(".bss.noinit")))
 int16_t g_sample;           // Muestra de audio calculada en cada iteración
@@ -93,7 +95,7 @@ int main() {
 
   // --------------------------------------------------------------------------
   // Fin del test - Punto de inspección con debugger
-  __asm volatile ("BKPT #0");
+  __BKPT (0);
 
   // Bucle infinito (nunca se alcanza en depuración)
   while(1);

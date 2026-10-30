@@ -1,7 +1,7 @@
 /**
  * @file main.c
  * @brief Programa principal del laboratorio 4 - Modulación FSK y gestión de audio.
- * @date :2025/10/28 08:02:18
+ * @date :2026/10/30 10:10:27
  * @date Last modified: 2025/10/20 09:37:00
  *
  * Este fichero implementa el programa principal para el laboratorio 4, que incluye:
@@ -25,7 +25,6 @@
  *   Tarea 4: Genera muestras de audio FSK y las almacena en el buffer circular.
  *            - lab41(): Modulación FSK con control por pulsaciones.
  *            - lab42(): Modulación FSK con transmisión de buffer de texto.
- *   Tarea 5: Efecto breathing en LED ETH (se ejecuta continuamente).
  *
  * Configuración del codec WM8731:
  * - Frecuencia de muestreo: 48 kHz.
@@ -36,7 +35,7 @@
  * Comunicación con ISR:
  * - El buffer circular g_tx_buffer se comparte entre main() y la ISR de I2S.
  * - g_tx_buffer se define en circ_buf.c y se declara como extern en circ_buf.h.
- * - Las operaciones de push están protegidas con __disable_irq()/__enable_irq().
+ * - Las operaciones de push están protegidas mediante una sección crítica breve.
  *
  * Arquitectura software: https://tinyurl.com/ysew73ht
  */
@@ -76,24 +75,39 @@ int32_t main(void)
                   WM8731_HP_OUT_GAIN_0_DB,   // Output headphone jack Gain (dB)
                   WM8731_LINE_IN_GAIN_0_DB); // Line-in input gain (dB)
 
-  // Puesta en marcha de I2S
-  I2S_start();
 
-  // Inicialización del buffer circular de transmisión
-  circ_buf_init(&g_tx_buffer, 4, 0);
+/* TODO: Inicialización de la aplicación:
+ *
+ *     ┌────────────────────────────────────┐
+ *     │   Inicializar g_tx_buffer vacío    │
+ *     └──────────────────┬─────────────────┘
+ *                        ▼
+ *     ┌────────────────────────────────────┐
+ *     │ Generar e insertar 127 muestras    │
+ *     │        con valor de reposo         │
+ *     └──────────────────┬─────────────────┘
+ *                        ▼
+ *     ┌────────────────────────────────────┐
+ *     │    Iniciar I2S y precargar su      │
+ *     │         FIFO con silencio          │
+ *     └──────────────────┬─────────────────┘
+ *                        ▼
+ *     ┌────────────────────────────────────┐
+ *     │         Habilitar IRQ I2S          │
+ *     └──────────────────┬─────────────────┘
+ *                        ▼
+ */
 
-
-  // TODO:  Habilita interrupción I2S en NVIC
-  ...
 
   /**
-   * Ejecutivo cíclico, utilizamos Round-Robin para la organización de tareas
+   * Ejecutivo cíclico, utilizamos Round-Robin (superloop) para la organización
+   *   de tareas
    * @cite  David E. Simon, "An Embedded Software Primer", Addison-Wesley 2005
    */
 
   uint8_t pulsacion = 0;
   uint8_t contador = 0;
-  int16_t sample = 0;  // Muestra que se envía al códec
+  int16_t sample;  // Muestra que se envía al códec
 
   while (1)
   {
@@ -122,20 +136,35 @@ int32_t main(void)
     /** @note: => Utiliza un buffer circular para compartir información con la ISR
      */
 
-    __disable_irq(); // Proteger acceso a variable compartida
-    // TODO: Guarda muestra en el buffer circular
-    uint8_t error_push = ...
-    __enable_irq();
+    /*
+     *      ╱───────────────╲
+     *     ╱ ¿Hay espacio en ╲ no
+     *    ⟨    g_tx_buffer?   ⟩─────────┐
+     *     ╲                 ╱          │
+     *      ╲───────────────╱           │
+     *              │ sí                │
+     *              ▼                   │
+     *      ┌───────────────┐           │
+     *      │ Calcular sig. │           │
+     *      │ muestra con   │           │
+     *      │ lab41()       │           │
+     *      └───────┬───────┘           │
+     *              │                   │
+     *              ▼                   │
+     *      ┌───────────────┐           │
+     *      │ Insertar      │           │
+     *      │ muestra en    │           │
+     *      │ g_tx_buffer   │           │
+     *      └───────┬───────┘           │
+     *              │                   │
+     *              ▼                   │
+     *              ├───────────────────┘
+     *
+     */
 
-    // TODO : Si no hay error al guardar la muestra, calcula la siguiente muestra
-    ...
 
-    // 🗲 Tareas que se ejecuta siempre
-    if (1) {
-      // Tarea 5: Encendido del led ETH con efecto breathing
-      breath_led(LED_ETH);
-    }
-  }
 
-  return 0; // nunca alcanzado
+  } // Fin del bucle while(1)
 }
+
+//EOF
