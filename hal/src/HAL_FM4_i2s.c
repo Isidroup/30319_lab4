@@ -98,18 +98,23 @@ void I2S_tx(uint32_t c)
 
 void I2S_start (void)
 {
-    FM4_I2S0->OPRREG_f.START  = 1u ;    // start the I2S module
-    while (bFM4_I2S0_STATUS_TXFI == 1)  // fill input FIFO with zeros until it is full
+    FM4_I2S0->OPRREG_f.START = 1u;  // Iniciar el módulo I2S
+
+    // Llenar la FIFO hasta su capacidad total:
+    // Utiliza 66u en modo dúplex (TXDIS=0, RXDIS=0)
+    // Utiliza 132u si estás en modo solo transmisión (TXDIS=0, RXDIS=1)
+    while (FM4_I2S0->STATUS_f.TXNUM < 66u)
     {
-      FM4_I2S0->TXFDAT = 0;
+        FM4_I2S0->TXFDAT = 0u;       // Escribir ceros hasta completar las 66 palabras
     }
-    FM4_I2S0->OPRREG_f.START  = 1u ;    // start the I2S module
 }
 
 uint8_t I2S_isTxBufferFree(void)
 {
-    return (bFM4_I2S0_STATUS_TXFI == 1);
+      uint8_t salida = (FM4_I2S0->STATUS_f.TXNUM < 66u)?1u:0;
+    return salida;
 }
+
 
 uint8_t I2S_isRxBufferNotEmpty(void)
 {
