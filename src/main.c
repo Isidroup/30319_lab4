@@ -1,7 +1,7 @@
-/**
+﻿/**
  * @file main.c
  * @brief Programa principal del laboratorio 4 - Modulación FSK y gestión de audio.
- * @date :2026/10/30 10:10:27
+ * @date :2026/11/12 07:52:27
  * @date Last modified: 2025/10/20 09:37:00
  *
  * Este fichero implementa el programa principal para el laboratorio 4, que incluye:
